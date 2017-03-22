@@ -1,8 +1,8 @@
 var orderbook_url = {
   coinone_eth: 'https://api.coinone.co.kr/orderbook?currency=eth',
   coinone_etc: 'https://api.coinone.co.kr/orderbook?currency=etc',
-  korbit_eth: 'https://api.korbit.co.kr/v1/orderbook?currency_pair=eth_krw',
-  korbit_etc: 'https://api.korbit.co.kr/v1/orderbook?currency_pair=etc_krw',
+  korbit_eth: 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=eth_krw',
+  korbit_etc: 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=etc_krw',
 };
 
 var orderbook = {
