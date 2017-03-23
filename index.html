@@ -39,7 +39,7 @@
       <tr>
         <td>Korbit {{eth_korbit_coinone.avg_buy_price}}
         </td>
-        <td>{{eth_korbit_coinone.profit}}
+        <td ng-class="{success: eth_korbit_coinone.profit > 0}">{{eth_korbit_coinone.profit}}({{eth_korbit_coinone.profit_percent}})
         </td>
         <td>-
         </td>
@@ -49,7 +49,7 @@
         </td>
         <td>-
         </td>
-        <td>{{eth_coinone_korbit.profit}}
+        <td ng-class="{success: eth_coinone_korbit.profit > 0}">{{eth_coinone_korbit.profit}}({{eth_coinone_korbit.profit_percent}})
         </td>
       </tr>
     </table>
@@ -66,7 +66,7 @@
       <tr>
         <td>Korbit {{etc_korbit_coinone.avg_buy_price}}
         </td>
-        <td>{{etc_korbit_coinone.profit}}
+        <td ng-class="{success: etc_korbit_coinone.profit > 0}">{{etc_korbit_coinone.profit}}({{etc_korbit_coinone.profit_percent}})
         </td>
         <td>-
         </td>
@@ -76,7 +76,7 @@
         </td>
         <td>-
         </td>
-        <td>{{etc_coinone_korbit.profit}}
+        <td ng-class="{success: etc_coinone_korbit.profit > 0}">{{etc_coinone_korbit.profit}}({{etc_coinone_korbit.profit_percent}})
         </td>
       </tr>
     </table>

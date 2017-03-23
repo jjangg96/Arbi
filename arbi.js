@@ -153,7 +153,8 @@ arbiApp.controller('arbiController', function arbiController($scope) {
       sell: sell_list,
       qty: buy_qty,
       avg_buy_price: get_avg_price(buy_list, buy_qty),
-      avg_sell_price: get_avg_price(sell_list, buy_qty)
+      avg_sell_price: get_avg_price(sell_list, buy_qty),
+      profit_percent: ((parseInt(esti_value - origin_krw) * 100) / origin_krw).toFixed(1) + '%'
     };
   }
 
@@ -161,14 +162,14 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   update_orderbook();
 
   setInterval(function(){
-    var krw = parseInt($('#krw').val());
+    $scope.krw = parseInt($('#krw').val());
     var wait_trade = $('#wait_trade').is(":checked");
     update_orderbook(function(){
 
-      $scope.eth_korbit_coinone = get_profit('eth', 'korbit', 'coinone', krw, wait_trade);
-      $scope.eth_coinone_korbit = get_profit('eth', 'coinone', 'korbit', krw, wait_trade);
-      $scope.etc_korbit_coinone = get_profit('etc', 'korbit', 'coinone', krw, wait_trade);
-      $scope.etc_coinone_korbit = get_profit('etc', 'coinone', 'korbit', krw, wait_trade);
+      $scope.eth_korbit_coinone = get_profit('eth', 'korbit', 'coinone', $scope.krw, wait_trade);
+      $scope.eth_coinone_korbit = get_profit('eth', 'coinone', 'korbit', $scope.krw, wait_trade);
+      $scope.etc_korbit_coinone = get_profit('etc', 'korbit', 'coinone', $scope.krw, wait_trade);
+      $scope.etc_coinone_korbit = get_profit('etc', 'coinone', 'korbit', $scope.krw, wait_trade);
       $scope.$apply();
     });
   }, 2000);
