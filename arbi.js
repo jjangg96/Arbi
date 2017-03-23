@@ -60,7 +60,24 @@ function update_orderbook(cb) {
   if(cb) cb();
 }
 
-function get_profit(coin, site1, site2, krw, wait_trade) {
+function get_avg_price(list, qty) {
+  sum = 0.0;
+  origin_qty = qty;
+
+  list.forEach(function(item){
+    if(qty <= item.qty) {
+      sum += item.price * qty;
+      qty -= qty;
+    } else {
+      sum += item.price * item.qty;
+      qty -= item.qty;
+    }
+  });
+
+  return parseInt(sum / origin_qty);
+}
+
+function get_profit(coin, from, to, krw, wait_trade) {
   buyer_fee = 0.0015;
   seller_fee = 0.0015;
 
@@ -72,15 +89,18 @@ function get_profit(coin, site1, site2, krw, wait_trade) {
   sell_list = [];
 
   //buy
-  ask = orderbook[site1+'_'+coin].ask;
-  bid = orderbook[site2+'_'+coin].bid;
+  from_ask = orderbook[from+'_'+coin].ask;
+  from_bid = orderbook[from+'_'+coin].bid;
+  to_ask = orderbook[to+'_'+coin].ask;
+  to_bid = orderbook[to+'_'+coin].bid;
+
 
   if(wait_trade) {
-    esti_qty = (krw / parseInt(bid[0].price) * (1-buyer_fee));
-    buy_list.push({price: bid[0].price, qty: esti_qty});
+    esti_qty = (krw / parseInt(from_bid[0].price) * (1-buyer_fee));
+    buy_list.push({price: from_bid[0].price, qty: esti_qty});
     krw = 0;
   } else {
-    ask.forEach(function(item){
+    from_ask.forEach(function(item){
       var price = parseInt(item.price);
       var qty = parseFloat(item.qty);
       var value = price * qty;
@@ -102,11 +122,11 @@ function get_profit(coin, site1, site2, krw, wait_trade) {
 
   //sell
   if(wait_trade) {
-    esti_value = (esti_qty * parseInt(ask[0].price) * (1-seller_fee));
-    sell_list.push({price: ask[0].price, qty: esti_qty});
+    esti_value = (esti_qty * parseInt(to_ask[0].price) * (1-seller_fee));
+    sell_list.push({price: to_ask[0].price, qty: esti_qty});
     esti_qty = 0;
   } else {
-    bid.forEach(function(item){
+    to_bid.forEach(function(item){
       var price = parseInt(item.price);
       var qty = parseFloat(item.qty);
       var value = price * qty;
@@ -128,7 +148,9 @@ function get_profit(coin, site1, site2, krw, wait_trade) {
     profit: parseInt(esti_value - origin_krw),
     buy: buy_list,
     sell: sell_list,
-    buy_qty: buy_qty
+    qty: buy_qty,
+    avg_buy_price: get_avg_price(buy_list, buy_qty),
+    avg_sell_price: get_avg_price(sell_list, buy_qty)
   };
 }
 
