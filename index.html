@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="arbiApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -16,39 +16,40 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
-  <body>
-    <input id="krw" value="10000000"></input>
-    <input id="wait_trade" type="checkbox"/> 1호가 대기 주문
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/angular/angular.min.js"></script>
     <script src="arbi.js"></script>
+  </head>
+  <body ng-controller="arbiController">
+    <input id="krw" value="10000000"></input>
+    <input id="wait_trade" type="checkbox"/> 1호가 대기 주문
 
     <table class="table table-bordered eth">
       <tr>
         <td>ETH
         </td>
-        <td>Coinone
+        <td>Coinone {{eth_korbit_coinone.avg_sell_price}}
         </td>
-        <td>Korbit
+        <td>Korbit {{eth_coinone_korbit.avg_sell_price}}
         </td>
       </tr>
       <tr>
-        <td>Korbit
+        <td>Korbit {{eth_korbit_coinone.avg_buy_price}}
         </td>
-        <td id="eth_korbit_coinone">0
+        <td>{{eth_korbit_coinone.profit}}
         </td>
         <td>-
         </td>
       </tr>
       <tr>
-        <td>Coinone
+        <td>Coinone {{eth_coinone_korbit.avg_buy_price}}
         </td>
         <td>-
         </td>
-        <td id="eth_coinone_korbit">0
+        <td>{{eth_coinone_korbit.profit}}
         </td>
       </tr>
     </table>
@@ -57,25 +58,25 @@
       <tr>
         <td>ETC
         </td>
-        <td>Coinone
+        <td>Coinone {{etc_korbit_coinone.avg_sell_price}}
         </td>
-        <td>Korbit
+        <td>Korbit {{etc_coinone_korbit.avg_sell_price}}
         </td>
       </tr>
       <tr>
-        <td>Korbit
+        <td>Korbit {{etc_korbit_coinone.avg_buy_price}}
         </td>
-        <td id="etc_korbit_coinone">0
+        <td>{{etc_korbit_coinone.profit}}
         </td>
         <td>-
         </td>
       </tr>
       <tr>
-        <td>Coinone
+        <td>Coinone {{etc_coinone_korbit.avg_buy_price}}
         </td>
         <td>-
         </td>
-        <td id="etc_coinone_korbit">0
+        <td>{{etc_coinone_korbit.profit}}
         </td>
       </tr>
     </table>
