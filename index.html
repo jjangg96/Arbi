@@ -21,6 +21,7 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/numeral/min/numeral.min.js"></script>
     <script src="arbi.js"></script>
   </head>
   <body ng-controller="arbiController">
@@ -41,8 +42,8 @@
             {{ to }}
           </div>
           <div ng-if="$index > 0 && $parent.$index >0 && arbi[coin][from][to].profit != 0">
-            {{arbi[coin][from][to].profit}} ({{ arbi[coin][from][to].profit_percent.toFixed(1) }}%)
-            <table class="table" ng-if="arbi[coin][from][to].profit_percent >= 0">
+            {{ arbi[coin][from][to].profit | krw }} ({{ arbi[coin][from][to].profit_percent.toFixed(1) }}%)
+            <table class="table" ng-if="arbi[coin][from][to].profit_percent >= 1">
               <tr>
                 <td>
                   <div ng-bind-html="draw_table('Buy', arbi[coin][from][to].buy, arbi[coin][from][to].avg_buy_price, arbi[coin][from][to].qty) | to_trusted"></div>

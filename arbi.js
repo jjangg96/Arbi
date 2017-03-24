@@ -1,39 +1,45 @@
 var arbiApp = angular.module('arbiApp', []);
+
 arbiApp.filter('to_trusted', ['$sce', function($sce) {
-    return function(text) {
-        return $sce.trustAsHtml(text);
-    };
+  return function(text) {
+    return $sce.trustAsHtml(text);
+  };
 }]);
+
+arbiApp.filter('krw', function() {
+  return function(n) {
+    return numeral(n).format('0,0');
+  };
+});
 
 
 arbiApp.controller('arbiController', function arbiController($scope) {
-  $scope.coins = ['eth', 'etc']
+  $scope.coins = ['btc', 'eth', 'etc']
   $scope.sites = ['coinone', 'korbit']
   $scope.krw = 5000000;
   $scope.arbi = {};
+  $scope.orderbook = {};
   //init
   $scope.coins.forEach(function(coin){
     $scope.arbi[coin] = {};
-    $scope.sites.forEach(function(from){
-      $scope.arbi[coin][from] = {};
+    $scope.orderbook[coin] = {};
+    $scope.sites.forEach(function(site){
+      $scope.arbi[coin][site] = {};
+      $scope.orderbook[coin][site] = {};
     });
   });
 
-  var orderbook_url = {
-    //coinone_btc: 'https://api.coinone.co.kr/orderbook?currency=eth',
-    coinone_eth: 'https://api.coinone.co.kr/orderbook?currency=eth',
-    coinone_etc: 'https://api.coinone.co.kr/orderbook?currency=etc',
-    //korbit_bth: 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=btc_krw',
-    korbit_eth: 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=eth_krw',
-    korbit_etc: 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=etc_krw',
+  var get_orderbook_url = function(coin, site){
+    if(site == 'coinone')
+      return 'https://api.coinone.co.kr/orderbook?currency=' + coin;
+    if(site == 'korbit')
+      return 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=' + coin + '_krw';
+    else {
+      console.log('no site');
+    }
   };
 
-  var orderbook = {
-    coinone_eth: {},
-    coinone_etc: {},
-    korbit_eth: {},
-    korbit_etc: {}
-  };
+
 
   //parse
   function parse_orderbook(site, data) {
@@ -63,9 +69,9 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   }
 
   //read orderbook
-  function get_orderbook(site, cb) {
+  function get_orderbook(coin, site, cb) {
     $.ajax({
-      url: orderbook_url[site],
+      url: get_orderbook_url(coin, site),
     }).done(function(data){
       data = parse_orderbook(site, data);
       if(cb) cb(data);
@@ -75,11 +81,14 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   }
 
   function update_orderbook(cb) {
-    Object.keys(orderbook_url).forEach(function(key){
-      get_orderbook(key, function(data){
-        orderbook[key] = data;
+    $scope.coins.forEach(function(coin){
+      $scope.sites.forEach(function(site){
+        get_orderbook(coin, site, function(data){
+          $scope.orderbook[coin][site] = data;
+        });
       });
     });
+
     if(cb) cb();
   }
 
@@ -108,11 +117,11 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     table += '<p>' + title + '</p>';
     table += '<table class="table table-bordered table-striped table-hover table-condensed">';
     table += "<thead>";
-    table += "<tr><th>Price(" + price + ")</th><th>Qty(" + qty.toFixed(2) + ")</th></tr>";
+    table += "<tr><th>Price(" + numeral(price).format('0,0') + ")</th><th>Qty(" + numeral(qty.toFixed(2)).format('0,0') + ")</th></tr>";
     table += "</thead>";
     list.forEach(function(item){
       table += "<tr>";
-      table += "<td>" + item.price + "</td><td>" + parseFloat(item.qty).toFixed(2) + "</td>";
+      table += "<td>" + numeral(item.price).format('0,0') + "</td><td>" + numeral(parseFloat(item.qty).toFixed(2)).format('0,0') + "</td>";
       table += "</tr>";
     });
     table += "</table>";
@@ -143,10 +152,10 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     sell_list = [];
 
     //buy
-    from_ask = orderbook[from+'_'+coin].ask;
-    from_bid = orderbook[from+'_'+coin].bid;
-    to_ask = orderbook[to+'_'+coin].ask;
-    to_bid = orderbook[to+'_'+coin].bid;
+    from_ask = $scope.orderbook[coin][from].ask;
+    from_bid = $scope.orderbook[coin][from].bid;
+    to_ask = $scope.orderbook[coin][to].ask;
+    to_bid = $scope.orderbook[coin][to].bid;
 
 
     if(wait_buy_trade) {
