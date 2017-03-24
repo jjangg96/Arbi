@@ -1,9 +1,29 @@
 var arbiApp = angular.module('arbiApp', []);
+arbiApp.filter('to_trusted', ['$sce', function($sce) {
+    return function(text) {
+        return $sce.trustAsHtml(text);
+    };
+}]);
+
+
 arbiApp.controller('arbiController', function arbiController($scope) {
+  $scope.coins = ['eth', 'etc']
+  $scope.sites = ['coinone', 'korbit']
+  $scope.krw = 5000000;
+  $scope.arbi = {};
+  //init
+  $scope.coins.forEach(function(coin){
+    $scope.arbi[coin] = {};
+    $scope.sites.forEach(function(from){
+      $scope.arbi[coin][from] = {};
+    });
+  });
 
   var orderbook_url = {
+    //coinone_btc: 'https://api.coinone.co.kr/orderbook?currency=eth',
     coinone_eth: 'https://api.coinone.co.kr/orderbook?currency=eth',
     coinone_etc: 'https://api.coinone.co.kr/orderbook?currency=etc',
+    //korbit_bth: 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=btc_krw',
     korbit_eth: 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=eth_krw',
     korbit_etc: 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=etc_krw',
   };
@@ -77,10 +97,41 @@ arbiApp.controller('arbiController', function arbiController($scope) {
       }
     });
 
-    return parseInt(sum / origin_qty);
+    return parseInt((sum / origin_qty) / 100) * 100;
   }
 
+  $scope.draw_table = function(title, list, price, qty) {
+    if(list == undefined)
+      return;
+
+    var table = '<div class="' + title + '">';
+    table += '<p>' + title + '</p>';
+    table += '<table class="table table-bordered table-striped table-hover table-condensed">';
+    table += "<thead>";
+    table += "<tr><th>Price(" + price + ")</th><th>Qty(" + qty.toFixed(2) + ")</th></tr>";
+    table += "</thead>";
+    list.forEach(function(item){
+      table += "<tr>";
+      table += "<td>" + item.price + "</td><td>" + parseFloat(item.qty).toFixed(2) + "</td>";
+      table += "</tr>";
+    });
+    table += "</table>";
+    table += "</p>";
+    return table;
+  };
+
   function get_profit(coin, from, to, krw, wait_buy_trade, wait_sell_trade) {
+    if(from == to || from == '' || to == '') {
+      return {
+        profit: 0,
+        buy: [],
+        sell: [],
+        qty: 0,
+        avg_buy_price: 0,
+        avg_sell_price: 0,
+        profit_percent: 0,
+      };
+    }
     buyer_fee = 0.0015;
     seller_fee = 0.0015;
 
@@ -154,7 +205,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
       qty: buy_qty,
       avg_buy_price: get_avg_price(buy_list, buy_qty),
       avg_sell_price: get_avg_price(sell_list, buy_qty),
-      profit_percent: ((parseInt(esti_value - origin_krw) * 100) / origin_krw).toFixed(1) + '%'
+      profit_percent: (parseInt(esti_value - origin_krw) * 100) / origin_krw
     };
   }
 
@@ -162,15 +213,17 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   update_orderbook();
 
   setInterval(function(){
-    $scope.krw = parseInt($('#krw').val());
     var wait_buy_trade = $('#wait_buy_trade').is(":checked");
     var wait_sell_trade = $('#wait_sell_trade').is(":checked");
-    update_orderbook(function(){
 
-      $scope.eth_korbit_coinone = get_profit('eth', 'korbit', 'coinone', $scope.krw, wait_buy_trade, wait_sell_trade);
-      $scope.eth_coinone_korbit = get_profit('eth', 'coinone', 'korbit', $scope.krw, wait_buy_trade, wait_sell_trade);
-      $scope.etc_korbit_coinone = get_profit('etc', 'korbit', 'coinone', $scope.krw, wait_buy_trade, wait_sell_trade);
-      $scope.etc_coinone_korbit = get_profit('etc', 'coinone', 'korbit', $scope.krw, wait_buy_trade, wait_sell_trade);
+    update_orderbook(function(){
+      $scope.coins.forEach(function(coin){
+        $scope.sites.forEach(function(from){
+          $scope.sites.forEach(function(to){
+            $scope.arbi[coin][from][to] = get_profit(coin, from, to, $scope.krw, wait_buy_trade, wait_sell_trade);
+          });
+        });
+      });
       $scope.$apply();
     });
   }, 2000);

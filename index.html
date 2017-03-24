@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="arbiApp">
+<html lang="ko" ng-app="arbiApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -24,62 +24,38 @@
     <script src="arbi.js"></script>
   </head>
   <body ng-controller="arbiController">
-    <input id="krw" value="10000000"></input>
+    <input ng-model="krw" value="10000000"></input>
     <input id="wait_buy_trade" type="checkbox"/> 1호가 매수 대기 주문
     <input id="wait_sell_trade" type="checkbox"/> 1호가 매도 대기 주문
 
-    <table class="table table-bordered eth">
-      <tr>
-        <td>ETH
-        </td>
-        <td>Coinone {{eth_korbit_coinone.avg_sell_price}}
-        </td>
-        <td>Korbit {{eth_coinone_korbit.avg_sell_price}}
-        </td>
-      </tr>
-      <tr>
-        <td>Korbit {{eth_korbit_coinone.avg_buy_price}}
-        </td>
-        <td ng-class="{success: eth_korbit_coinone.profit > 0}">{{eth_korbit_coinone.profit}}({{eth_korbit_coinone.profit_percent}})
-        </td>
-        <td>-
-        </td>
-      </tr>
-      <tr>
-        <td>Coinone {{eth_coinone_korbit.avg_buy_price}}
-        </td>
-        <td>-
-        </td>
-        <td ng-class="{success: eth_coinone_korbit.profit > 0}">{{eth_coinone_korbit.profit}}({{eth_coinone_korbit.profit_percent}})
+    <table class="table table-bordered" ng-class="coin" ng-repeat="coin in coins">
+      <tr ng-repeat="from in [''].concat(sites)">
+        <td ng-class="{success: arbi[coin][from][to].profit_percent >= 1}" ng-repeat="to in [''].concat(sites)">
+          <div ng-if="$parent.$index == 0 && $index == 0">
+            {{ coin.toUpperCase() }}
+          </div>
+          <div ng-if="$index == 0">
+            {{ from }}
+          </div>
+          <div ng-if="$parent.$index == 0">
+            {{ to }}
+          </div>
+          <div ng-if="$index > 0 && $parent.$index >0 && arbi[coin][from][to].profit != 0">
+            {{arbi[coin][from][to].profit}} ({{ arbi[coin][from][to].profit_percent.toFixed(1) }}%)
+            <table class="table" ng-if="arbi[coin][from][to].profit_percent >= 0">
+              <tr>
+                <td>
+                  <div ng-bind-html="draw_table('Buy', arbi[coin][from][to].buy, arbi[coin][from][to].avg_buy_price, arbi[coin][from][to].qty) | to_trusted"></div>
+                </td>
+                <td>
+                  <div ng-bind-html="draw_table('Sell', arbi[coin][from][to].sell, arbi[coin][from][to].avg_sell_price, arbi[coin][from][to].qty) | to_trusted"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
         </td>
       </tr>
     </table>
 
-    <table class="table table-bordered etc">
-      <tr>
-        <td>ETC
-        </td>
-        <td>Coinone {{etc_korbit_coinone.avg_sell_price}}
-        </td>
-        <td>Korbit {{etc_coinone_korbit.avg_sell_price}}
-        </td>
-      </tr>
-      <tr>
-        <td>Korbit {{etc_korbit_coinone.avg_buy_price}}
-        </td>
-        <td ng-class="{success: etc_korbit_coinone.profit > 0}">{{etc_korbit_coinone.profit}}({{etc_korbit_coinone.profit_percent}})
-        </td>
-        <td>-
-        </td>
-      </tr>
-      <tr>
-        <td>Coinone {{etc_coinone_korbit.avg_buy_price}}
-        </td>
-        <td>-
-        </td>
-        <td ng-class="{success: etc_coinone_korbit.profit > 0}">{{etc_coinone_korbit.profit}}({{etc_coinone_korbit.profit_percent}})
-        </td>
-      </tr>
-    </table>
   </body>
 </html>
