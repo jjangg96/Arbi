@@ -80,7 +80,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     return parseInt(sum / origin_qty);
   }
 
-  function get_profit(coin, from, to, krw, wait_trade) {
+  function get_profit(coin, from, to, krw, wait_buy_trade, wait_sell_trade) {
     buyer_fee = 0.0015;
     seller_fee = 0.0015;
 
@@ -98,7 +98,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     to_bid = orderbook[to+'_'+coin].bid;
 
 
-    if(wait_trade) {
+    if(wait_buy_trade) {
       esti_qty = (krw / parseInt(from_bid[0].price) * (1-buyer_fee));
       buy_list.push({price: from_bid[0].price, qty: esti_qty});
       krw = 0;
@@ -124,7 +124,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     buy_qty = esti_qty;
 
     //sell
-    if(wait_trade) {
+    if(wait_sell_trade) {
       esti_value = (esti_qty * parseInt(to_ask[0].price) * (1-seller_fee));
       sell_list.push({price: to_ask[0].price, qty: esti_qty});
       esti_qty = 0;
@@ -163,13 +163,14 @@ arbiApp.controller('arbiController', function arbiController($scope) {
 
   setInterval(function(){
     $scope.krw = parseInt($('#krw').val());
-    var wait_trade = $('#wait_trade').is(":checked");
+    var wait_buy_trade = $('#wait_buy_trade').is(":checked");
+    var wait_sell_trade = $('#wait_sell_trade').is(":checked");
     update_orderbook(function(){
 
-      $scope.eth_korbit_coinone = get_profit('eth', 'korbit', 'coinone', $scope.krw, wait_trade);
-      $scope.eth_coinone_korbit = get_profit('eth', 'coinone', 'korbit', $scope.krw, wait_trade);
-      $scope.etc_korbit_coinone = get_profit('etc', 'korbit', 'coinone', $scope.krw, wait_trade);
-      $scope.etc_coinone_korbit = get_profit('etc', 'coinone', 'korbit', $scope.krw, wait_trade);
+      $scope.eth_korbit_coinone = get_profit('eth', 'korbit', 'coinone', $scope.krw, wait_buy_trade, wait_sell_trade);
+      $scope.eth_coinone_korbit = get_profit('eth', 'coinone', 'korbit', $scope.krw, wait_buy_trade, wait_sell_trade);
+      $scope.etc_korbit_coinone = get_profit('etc', 'korbit', 'coinone', $scope.krw, wait_buy_trade, wait_sell_trade);
+      $scope.etc_coinone_korbit = get_profit('etc', 'coinone', 'korbit', $scope.krw, wait_buy_trade, wait_sell_trade);
       $scope.$apply();
     });
   }, 2000);
