@@ -15,7 +15,7 @@ arbiApp.filter('krw', function() {
 
 arbiApp.controller('arbiController', function arbiController($scope) {
   $scope.coins = ['btc', 'eth', 'etc']
-  $scope.sites = ['coinone', 'korbit']
+  $scope.sites = ['coinone', 'korbit', 'bithumb']
   $scope.krw = 5000000;
   $scope.arbi = {};
   $scope.orderbook = {};
@@ -34,6 +34,8 @@ arbiApp.controller('arbiController', function arbiController($scope) {
       return 'https://api.coinone.co.kr/orderbook?currency=' + coin;
     if(site == 'korbit')
       return 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=' + coin + '_krw';
+    if(site == 'bithumb')
+      return 'https://api.bithumb.com/public/orderbook/' + coin;
     else {
       console.log('no site');
     }
@@ -46,15 +48,32 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     if(data && typeof(data) === 'string')
       data = JSON.parse(data);
 
-    if(data.hasOwnProperty('bids')) {
+    if(site == 'bithumb') {
+      data['bid'] = [];
+      data['ask'] = [];
+
+      if(data['data']['bids'].length > 0) {
+        data['data']['bids'].forEach(function(item){
+          data['bid'].push({price: item.price, qty: item.quantity });
+        });
+      }
+
+      if(data['data']['asks'].length > 0) {
+        data['data']['asks'].forEach(function(item){
+          data['ask'].push({price: item.price, qty: item.quantity });
+        });
+      }
+
+    }
+
+    if(site == 'korbit') {
       if($.isArray(data['bids'][0])) {
         data['bid'] = [];
         data['bids'].forEach(function(item){
           data['bid'].push({price: item[0], qty: item[1] });
         });
       }
-    }
-    if(data.hasOwnProperty('asks')) {
+
       if($.isArray(data['asks'][0])) {
         data['ask'] = [];
         data['asks'].forEach(function(item){
@@ -159,9 +178,14 @@ arbiApp.controller('arbiController', function arbiController($scope) {
 
 
     if(wait_buy_trade) {
-      esti_qty = (krw / parseInt(from_bid[0].price) * (1-buyer_fee));
-      buy_list.push({price: from_bid[0].price, qty: esti_qty});
-      krw = 0;
+      if(from_bid.length > 0) {
+        esti_qty = (krw / parseInt(from_bid[0].price) * (1-buyer_fee));
+        buy_list.push({price: from_bid[0].price, qty: esti_qty});
+        krw = 0;
+      } else {
+        esti_qty = 0;
+        krw = 0;
+      }
     } else {
       from_ask.forEach(function(item){
         var price = parseInt(item.price);
@@ -185,9 +209,15 @@ arbiApp.controller('arbiController', function arbiController($scope) {
 
     //sell
     if(wait_sell_trade) {
-      esti_value = (esti_qty * parseInt(to_ask[0].price) * (1-seller_fee));
-      sell_list.push({price: to_ask[0].price, qty: esti_qty});
-      esti_qty = 0;
+      if(to_ask.length > 0) {
+        esti_value = (esti_qty * parseInt(to_ask[0].price) * (1-seller_fee));
+        sell_list.push({price: to_ask[0].price, qty: esti_qty});
+        esti_qty = 0;
+      } else {
+        esti_value = 0;
+        esti_qty = 0;
+      }
+
     } else {
       to_bid.forEach(function(item){
         var price = parseInt(item.price);
