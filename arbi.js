@@ -170,72 +170,66 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     buy_list = [];
     sell_list = [];
 
-    //buy
     from_ask = $scope.orderbook[coin][from].ask;
     from_bid = $scope.orderbook[coin][from].bid;
     to_ask = $scope.orderbook[coin][to].ask;
     to_bid = $scope.orderbook[coin][to].bid;
 
-
-    if(wait_buy_trade) {
-      if(from_bid.length > 0) {
+    if(to_ask.length <= 0 || to_bid.length <= 0 || from_bid.length <= 0 || from_ask.lenght <= 0) {
+      esti_value = 0;
+      esti_qty = 0;
+    } else {
+      //buy
+      if(wait_buy_trade) {
         esti_qty = (krw / parseInt(from_bid[0].price) * (1-buyer_fee));
         buy_list.push({price: from_bid[0].price, qty: esti_qty});
         krw = 0;
       } else {
-        esti_qty = 0;
-        krw = 0;
+        from_ask.forEach(function(item){
+          var price = parseInt(item.price);
+          var qty = parseFloat(item.qty);
+          var value = price * qty;
+
+          if(krw <= 0) {
+          } else if(value >= krw) {
+            buy_list.push(item);
+            esti_qty += ((krw / (price * 1.0)) * (1-buyer_fee))
+            krw -= krw;
+          } else {
+            buy_list.push(item);
+            esti_qty += (qty * (1-buyer_fee));
+            krw -= value;
+          }
+        });
       }
-    } else {
-      from_ask.forEach(function(item){
-        var price = parseInt(item.price);
-        var qty = parseFloat(item.qty);
-        var value = price * qty;
 
-        if(krw <= 0) {
-        } else if(value >= krw) {
-          buy_list.push(item);
-          esti_qty += ((krw / (price * 1.0)) * (1-buyer_fee))
-          krw -= krw;
-        } else {
-          buy_list.push(item);
-          esti_qty += (qty * (1-buyer_fee));
-          krw -= value;
-        }
-      });
-    }
+      buy_qty = esti_qty;
 
-    buy_qty = esti_qty;
-
-    //sell
-    if(wait_sell_trade) {
-      if(to_ask.length > 0) {
+      //sell
+      if(wait_sell_trade) {
         esti_value = (esti_qty * parseInt(to_ask[0].price) * (1-seller_fee));
         sell_list.push({price: to_ask[0].price, qty: esti_qty});
         esti_qty = 0;
       } else {
-        esti_value = 0;
-        esti_qty = 0;
+        to_bid.forEach(function(item){
+          var price = parseInt(item.price);
+          var qty = parseFloat(item.qty);
+          var value = price * qty;
+
+          if(esti_qty <= 0) {
+          } else if(esti_qty <= qty) {
+            sell_list.push(item);
+            esti_value += ((esti_qty * price) * (1-seller_fee));
+            esti_qty -= esti_qty;
+          } else {
+            sell_list.push(item);
+            esti_value += (value * (1-seller_fee));
+            esti_qty -= qty;
+          }
+        });
       }
-
-    } else {
-      to_bid.forEach(function(item){
-        var price = parseInt(item.price);
-        var qty = parseFloat(item.qty);
-        var value = price * qty;
-
-        if(esti_qty <= 0) {
-        } else if(esti_qty <= qty) {
-          sell_list.push(item);
-          esti_value += ((esti_qty * price) * (1-seller_fee));
-          esti_qty -= esti_qty;
-        } else {
-          sell_list.push(item);
-          esti_value += (value * (1-seller_fee));
-          esti_qty -= qty;
-        }
-      });
     }
+
 
     return {
       profit: parseInt(esti_value - origin_krw),
