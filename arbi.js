@@ -35,7 +35,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     if(site == 'korbit')
       return 'http://j96.me:3000/get?url=https://api.korbit.co.kr/v1/orderbook?currency_pair=' + coin + '_krw';
     if(site == 'bithumb')
-      return 'https://api.bithumb.com/public/orderbook/' + coin;
+      return 'http://j96.me:3000/get?url=https://api.bithumb.com/public/orderbook/' + coin;
     else {
       console.log('no site');
     }
