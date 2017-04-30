@@ -19,6 +19,10 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   $scope.krw = 5000000;
   $scope.arbi = {};
   $scope.orderbook = {};
+
+  $scope.yobit_dash = 0;
+  $scope.bithumb_dash = 0;
+
   //init
   $scope.coins.forEach(function(coin){
     $scope.arbi[coin] = {};
@@ -85,6 +89,16 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     data['site'] = site;
 
     return data;
+  }
+
+  function get_json(url, cb) {
+    $.ajax({
+      url: url,
+    }).done(function(data){
+      if(cb) cb(data);
+    }).fail(function(){
+      if(cb) cb(null);
+    });
   }
 
   //read orderbook
@@ -258,6 +272,33 @@ arbiApp.controller('arbiController', function arbiController($scope) {
         });
       });
       $scope.$apply();
+    });
+
+    //dash bithumb
+    get_json('https://www.bithumb.com/trade/getAsset/DASH', function(data) {
+      $scope.bithumb_dash = data.data.DASH.LAST;
+    });
+
+    //dash yobit
+    get_json('https://yobit.net/api/3/depth/dash_btc?limit=100', function(data) {
+      data = JSON.parse(data);
+
+      sum_price = 0.0;
+      sum_qty = 0.0;
+      count = 0;
+
+      data.dash_btc.asks.forEach(function(item) {
+        if(sum_qty < 50) {
+          sum_price += item[0];
+          sum_qty += item[1];
+          count++;
+        }
+      });
+
+      price = sum_price / count;
+
+      $scope.yobit_dash = parseInt(price * $scope.orderbook['btc']['bithumb']['bid'][0].price);
+
     });
   }, 2000);
 });
