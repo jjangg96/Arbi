@@ -275,14 +275,13 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     });
 
     //dash bithumb
-    get_json('https://www.bithumb.com/trade/getAsset/DASH', function(data) {
-      $scope.bithumb_dash = data.data.DASH.LAST;
+    get_json('http://j96.me:3000/get?url=https://www.bithumb.com/trade/getAsset/DASH', function(data) {
+      $scope.bithumb_dash = JSON.parse(data).data.DASH.LAST;
     });
 
     //dash yobit
-    get_json('https://yobit.net/api/3/depth/dash_btc?limit=100', function(data) {
+    get_json('http://j96.me:3000/get?url=https://yobit.net/api/3/depth/dash_btc?limit=100', function(data) {
       data = JSON.parse(data);
-
       sum_price = 0.0;
       sum_qty = 0.0;
       count = 0;
