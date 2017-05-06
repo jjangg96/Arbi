@@ -402,7 +402,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
       sum_qty = 0.0;
       count = 0;
 
-      data.eth_ltc.asks.forEach(function(item) {
+      data.eth_ltc.bids.forEach(function(item) {
         if(sum_qty < 50) {
           sum_price += item[0];
           sum_qty += item[1];
