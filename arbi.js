@@ -21,7 +21,14 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   $scope.orderbook = {};
 
   $scope.yobit_dash = 0;
+  $scope.btce_dash = 0;
+  $scope.btce_eth = 0;
+  $scope.btce_ltc = 0;
+  $scope.btce_dash_eth = 0;
+  $scope.btce_ltc_eth = 0;
   $scope.bithumb_dash = 0;
+  $scope.bithumb_eth = 0;
+  $scope.bithumb_ltc = 0;
 
   //init
   $scope.coins.forEach(function(coin){
@@ -274,9 +281,17 @@ arbiApp.controller('arbiController', function arbiController($scope) {
       $scope.$apply();
     });
 
-    //dash bithumb
+    //bithumb
     get_json('http://j96.me:3000/get?url=https://www.bithumb.com/trade/getAsset/DASH', function(data) {
       $scope.bithumb_dash = JSON.parse(data).data.DASH.LAST;
+    });
+
+    get_json('http://j96.me:3000/get?url=https://www.bithumb.com/trade/getAsset/DASH', function(data) {
+      $scope.bithumb_ltc = JSON.parse(data).data.LTC.LAST;
+    });
+
+    get_json('http://j96.me:3000/get?url=https://www.bithumb.com/trade/getAsset/DASH', function(data) {
+      $scope.bithumb_eth = JSON.parse(data).data.ETH.LAST;
     });
 
     //dash yobit
@@ -299,6 +314,108 @@ arbiApp.controller('arbiController', function arbiController($scope) {
       $scope.yobit_dash = parseInt(price * $scope.orderbook['btc']['bithumb']['bid'][0].price);
 
     });
+
+    //btc-e
+    get_json('http://j96.me:3000/get?url=https://btc-e.com/api/3/depth/dsh_btc', function(data) {
+      data = JSON.parse(data);
+      sum_price = 0.0;
+      sum_qty = 0.0;
+      count = 0;
+
+      data.dsh_btc.asks.forEach(function(item) {
+        if(sum_qty < 50) {
+          sum_price += item[0];
+          sum_qty += item[1];
+          count++;
+        }
+      });
+
+      price = sum_price / count;
+
+      $scope.btce_dash = parseInt(price * $scope.orderbook['btc']['bithumb']['bid'][0].price);
+
+    });
+
+    get_json('http://j96.me:3000/get?url=https://btc-e.com/api/3/depth/ltc_btc', function(data) {
+      data = JSON.parse(data);
+      sum_price = 0.0;
+      sum_qty = 0.0;
+      count = 0;
+
+      data.ltc_btc.asks.forEach(function(item) {
+        if(sum_qty < 50) {
+          sum_price += item[0];
+          sum_qty += item[1];
+          count++;
+        }
+      });
+
+      price = sum_price / count;
+
+      $scope.btce_ltc = parseInt(price * $scope.orderbook['btc']['bithumb']['bid'][0].price);
+
+    });
+
+    get_json('http://j96.me:3000/get?url=https://btc-e.com/api/3/depth/eth_btc', function(data) {
+      data = JSON.parse(data);
+      sum_price = 0.0;
+      sum_qty = 0.0;
+      count = 0;
+
+      data.eth_btc.asks.forEach(function(item) {
+        if(sum_qty < 50) {
+          sum_price += item[0];
+          sum_qty += item[1];
+          count++;
+        }
+      });
+
+      price = sum_price / count;
+
+      $scope.btce_eth = parseInt(price * $scope.orderbook['btc']['bithumb']['bid'][0].price);
+
+    });
+
+    get_json('http://j96.me:3000/get?url=https://btc-e.com/api/3/depth/dsh_eth', function(data) {
+      data = JSON.parse(data);
+      sum_price = 0.0;
+      sum_qty = 0.0;
+      count = 0;
+
+      data.dsh_eth.asks.forEach(function(item) {
+        if(sum_qty < 50) {
+          sum_price += item[0];
+          sum_qty += item[1];
+          count++;
+        }
+      });
+
+      price = sum_price / count;
+
+      $scope.btce_dash_eth = parseInt(price * $scope.orderbook['eth']['bithumb']['bid'][0].price);
+
+    });
+
+    get_json('http://j96.me:3000/get?url=https://btc-e.com/api/3/depth/eth_ltc', function(data) {
+      data = JSON.parse(data);
+      sum_price = 0.0;
+      sum_qty = 0.0;
+      count = 0;
+
+      data.eth_ltc.asks.forEach(function(item) {
+        if(sum_qty < 50) {
+          sum_price += item[0];
+          sum_qty += item[1];
+          count++;
+        }
+      });
+
+      price = sum_price / count;
+
+      $scope.btce_ltc_eth = parseInt($scope.orderbook['eth']['bithumb']['bid'][0].price / price);
+
+    });
+
   }, 2000);
 });
 

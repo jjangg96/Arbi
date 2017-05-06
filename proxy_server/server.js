@@ -19,6 +19,9 @@ app.get('/get', function(req, res){
             port: '443',
             path: get_url.path,
             method: 'GET',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
         };
 
         var get_req = https.request(options, function(res2) {
