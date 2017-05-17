@@ -434,6 +434,8 @@ arbiApp.controller('arbiController', function arbiController($scope) {
         $scope.poloniex_xrp_krw = data.BTC_XRP.last * data2.btc.last;
         $scope.poloniex_xrp = data.BTC_XRP.last;
         $scope.coinone_xrp = data2.xrp.last;
+
+        document.title = "" + $scope.coinone_xrp + "/" + parseInt(data.BTC_XRP.last * data2.btc.last);
       });
     });
 
