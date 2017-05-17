@@ -280,6 +280,16 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   update_orderbook();
 
   setInterval(function(){
+    get_json('https://poloniex.com/public?command=returnTicker', function(data) {
+      get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
+        $scope.poloniex_xrp_krw = data.BTC_XRP.last * data2.btc.last;
+        $scope.poloniex_xrp = data.BTC_XRP.last;
+        $scope.coinone_xrp = data2.xrp.last;
+
+        document.title = "" + $scope.coinone_xrp + "/" + parseInt(data.BTC_XRP.last * data2.btc.last);
+      });
+    });
+    
     var wait_buy_trade = $('#wait_buy_trade').is(":checked");
     var wait_sell_trade = $('#wait_sell_trade').is(":checked");
 
@@ -429,15 +439,6 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     //
     // });
 
-    get_json('https://poloniex.com/public?command=returnTicker', function(data) {
-      get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
-        $scope.poloniex_xrp_krw = data.BTC_XRP.last * data2.btc.last;
-        $scope.poloniex_xrp = data.BTC_XRP.last;
-        $scope.coinone_xrp = data2.xrp.last;
-
-        document.title = "" + $scope.coinone_xrp + "/" + parseInt(data.BTC_XRP.last * data2.btc.last);
-      });
-    });
 
   }, 2000);
 });
