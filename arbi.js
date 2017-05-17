@@ -30,6 +30,10 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   $scope.bithumb_eth = 0;
   $scope.bithumb_ltc = 0;
 
+  $scope.coinone_xrp = 0;
+  $scope.poloniex_xrp_krw = 0;
+  $scope.poloniex_xrp = 0;
+
   //init
   $scope.coins.forEach(function(coin){
     $scope.arbi[coin] = {};
@@ -56,41 +60,47 @@ arbiApp.controller('arbiController', function arbiController($scope) {
 
   //parse
   function parse_orderbook(site, data) {
-    if(data && typeof(data) === 'string')
-      data = JSON.parse(data);
+    data['bid'] = [];
+    data['ask'] = [];
 
-    if(site == 'bithumb') {
-      data['bid'] = [];
-      data['ask'] = [];
+    try {
 
-      if(data['data']['bids'].length > 0) {
-        data['data']['bids'].forEach(function(item){
-          data['bid'].push({price: item.price, qty: item.quantity });
-        });
+    } catch (e) {
+      if(data && typeof(data) === 'string')
+        data = JSON.parse(data);
+
+      if(site == 'bithumb') {
+
+        if(data['data']['bids'].length > 0) {
+          data['data']['bids'].forEach(function(item){
+            data['bid'].push({price: item.price, qty: item.quantity });
+          });
+        }
+
+        if(data['data']['asks'].length > 0) {
+          data['data']['asks'].forEach(function(item){
+            data['ask'].push({price: item.price, qty: item.quantity });
+          });
+        }
+
       }
 
-      if(data['data']['asks'].length > 0) {
-        data['data']['asks'].forEach(function(item){
-          data['ask'].push({price: item.price, qty: item.quantity });
-        });
-      }
+      if(site == 'korbit') {
+        if($.isArray(data['bids'][0])) {
+          data['bid'] = [];
+          data['bids'].forEach(function(item){
+            data['bid'].push({price: item[0], qty: item[1] });
+          });
+        }
 
-    }
-
-    if(site == 'korbit') {
-      if($.isArray(data['bids'][0])) {
-        data['bid'] = [];
-        data['bids'].forEach(function(item){
-          data['bid'].push({price: item[0], qty: item[1] });
-        });
+        if($.isArray(data['asks'][0])) {
+          data['ask'] = [];
+          data['asks'].forEach(function(item){
+            data['ask'].push({price: item[0], qty: item[1] });
+          });
+        }
       }
-
-      if($.isArray(data['asks'][0])) {
-        data['ask'] = [];
-        data['asks'].forEach(function(item){
-          data['ask'].push({price: item[0], qty: item[1] });
-        });
-      }
+    } finally {
     }
 
     data['site'] = site;
@@ -195,6 +205,9 @@ arbiApp.controller('arbiController', function arbiController($scope) {
     from_bid = $scope.orderbook[coin][from].bid;
     to_ask = $scope.orderbook[coin][to].ask;
     to_bid = $scope.orderbook[coin][to].bid;
+
+    if(to_ask == undefined || to_bid == undefined || from_ask == undefined || from_bid == undefined)
+      return;
 
     if(to_ask.length <= 0 || to_bid.length <= 0 || from_bid.length <= 0 || from_ask.lenght <= 0) {
       esti_value = 0;
@@ -414,6 +427,14 @@ arbiApp.controller('arbiController', function arbiController($scope) {
 
       $scope.btce_ltc_eth = parseInt($scope.orderbook['eth']['bithumb']['bid'][0].price / price);
 
+    });
+
+    get_json('https://poloniex.com/public?command=returnTicker', function(data) {
+      get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
+        $scope.poloniex_xrp_krw = data.BTC_XRP.last * data2.btc.last;
+        $scope.poloniex_xrp = data.BTC_XRP.last;
+        $scope.coinone_xrp = data2.xrp.last;
+      });
     });
 
   }, 2000);
