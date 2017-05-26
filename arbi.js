@@ -60,47 +60,41 @@ arbiApp.controller('arbiController', function arbiController($scope) {
 
   //parse
   function parse_orderbook(site, data) {
-    data['bid'] = [];
-    data['ask'] = [];
 
-    try {
+    if(data && typeof(data) === 'string')
+      data = JSON.parse(data);
 
-    } catch (e) {
-      if(data && typeof(data) === 'string')
-        data = JSON.parse(data);
+    if(site == 'bithumb') {
 
-      if(site == 'bithumb') {
-
-        if(data['data']['bids'].length > 0) {
-          data['data']['bids'].forEach(function(item){
-            data['bid'].push({price: item.price, qty: item.quantity });
-          });
-        }
-
-        if(data['data']['asks'].length > 0) {
-          data['data']['asks'].forEach(function(item){
-            data['ask'].push({price: item.price, qty: item.quantity });
-          });
-        }
-
+      if(data['data']['bids'].length > 0) {
+        data['bid'] = [];
+        data['data']['bids'].forEach(function(item){
+          data['bid'].push({price: item.price, qty: item.quantity });
+        });
       }
 
-      if(site == 'korbit') {
-        if($.isArray(data['bids'][0])) {
-          data['bid'] = [];
-          data['bids'].forEach(function(item){
-            data['bid'].push({price: item[0], qty: item[1] });
-          });
-        }
-
-        if($.isArray(data['asks'][0])) {
-          data['ask'] = [];
-          data['asks'].forEach(function(item){
-            data['ask'].push({price: item[0], qty: item[1] });
-          });
-        }
+      if(data['data']['asks'].length > 0) {
+        data['ask'] = [];
+        data['data']['asks'].forEach(function(item){
+          data['ask'].push({price: item.price, qty: item.quantity });
+        });
       }
-    } finally {
+    }
+
+    if(site == 'korbit') {
+      if($.isArray(data['bids'][0])) {
+        data['bid'] = [];
+        data['bids'].forEach(function(item){
+          data['bid'].push({price: item[0], qty: item[1] });
+        });
+      }
+
+      if($.isArray(data['asks'][0])) {
+        data['ask'] = [];
+        data['asks'].forEach(function(item){
+          data['ask'].push({price: item[0], qty: item[1] });
+        });
+      }
     }
 
     data['site'] = site;
@@ -289,7 +283,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
         document.title = "" + $scope.coinone_xrp + "/" + parseInt(data.BTC_XRP.last * data2.btc.last);
       });
     });
-    
+
     var wait_buy_trade = $('#wait_buy_trade').is(":checked");
     var wait_sell_trade = $('#wait_sell_trade').is(":checked");
 
