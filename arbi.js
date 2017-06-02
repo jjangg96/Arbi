@@ -33,6 +33,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   $scope.coinone_xrp = 0;
   $scope.poloniex_xrp_krw = 0;
   $scope.poloniex_xrp = 0;
+  $scope.bithumb_xrp = 0;
 
   //init
   $scope.coins.forEach(function(coin){
@@ -274,13 +275,17 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   update_orderbook();
 
   setInterval(function(){
+    get_json('http://j96.me:3000/get?url=https://www.bithumb.com/trade/getAsset/XRP', function(data) {
+      $scope.bithumb_xrp = JSON.parse(data).data.XRP.LAST;
+    });
+
     get_json('https://poloniex.com/public?command=returnTicker', function(data) {
       get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
         $scope.poloniex_xrp_krw = data.BTC_XRP.last * data2.btc.last;
         $scope.poloniex_xrp = data.BTC_XRP.last;
         $scope.coinone_xrp = data2.xrp.last;
 
-        document.title = "" + $scope.coinone_xrp + "/" + parseInt(data.BTC_XRP.last * data2.btc.last);
+        document.title = "" + $scope.bithumb_xrp + "/" + parseInt(data.BTC_XRP.last * data2.btc.last);
       });
     });
 
