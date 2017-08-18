@@ -35,6 +35,12 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   $scope.poloniex_xrp = 0;
   $scope.bithumb_xrp = 0;
 
+  $scope.coinone_bch = 0;
+  $scope.bittrex_bch_krw = 0;
+  $scope.bittrex_bch = 0;
+  $scope.poloniex_bch_krw = 0;
+  $scope.poloniex_bch = 0;
+
   //init
   $scope.coins.forEach(function(coin){
     $scope.arbi[coin] = {};
@@ -286,6 +292,22 @@ arbiApp.controller('arbiController', function arbiController($scope) {
         $scope.coinone_xrp = data2.xrp.last;
 
         document.title = "" + $scope.bithumb_xrp + "/" + parseInt(data.BTC_XRP.last * data2.btc.last);
+      });
+    });
+
+    get_json('https://poloniex.com/public?command=returnTicker', function(data) {
+      get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
+        $scope.poloniex_bch_krw = data.BTC_BCH.last * data2.btc.last;
+        $scope.poloniex_bch = data.BTC_BCH.last;
+        $scope.coinone_bch = data2.bch.last;
+      });
+    });
+
+    get_json('https://bittrex.com/api/v1.1/public/getticker?market=BTC-BCC', function(data) {
+      get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
+        $scope.bittrex_bch_krw = data.result.Last * data2.btc.last;
+        $scope.bittrex_bch = data.result.Last;
+        $scope.coinone_bch = data2.bch.last;
       });
     });
 
