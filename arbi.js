@@ -42,6 +42,8 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   $scope.bittrex_eth_bch = 0;
   $scope.poloniex_bch_krw = 0;
   $scope.poloniex_bch = 0;
+  $scope.poloniex_eth_bch_krw = 0;
+  $scope.poloniex_eth_bch = 0;
 
   //init
   $scope.coins.forEach(function(coin){
@@ -301,6 +303,14 @@ arbiApp.controller('arbiController', function arbiController($scope) {
       get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
         $scope.poloniex_bch_krw = data.BTC_BCH.last * data2.btc.last;
         $scope.poloniex_bch = data.BTC_BCH.last;
+        $scope.coinone_bch = data2.bch.last;
+      });
+    });
+
+    get_json('https://poloniex.com/public?command=returnTicker', function(data) {
+      get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
+        $scope.poloniex_eth_bch_krw = data.ETH_BCH.last * data2.eth.last;
+        $scope.poloniex_eth_bch = data.ETH_BCH.last;
         $scope.coinone_bch = data2.bch.last;
       });
     });
