@@ -38,6 +38,8 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   $scope.coinone_bch = 0;
   $scope.bittrex_bch_krw = 0;
   $scope.bittrex_bch = 0;
+  $scope.bittrex_eth_bch_krw = 0;
+  $scope.bittrex_eth_bch = 0;
   $scope.poloniex_bch_krw = 0;
   $scope.poloniex_bch = 0;
 
@@ -308,6 +310,15 @@ arbiApp.controller('arbiController', function arbiController($scope) {
         data = JSON.parse(data);
         $scope.bittrex_bch_krw = data.result.Last * data2.btc.last;
         $scope.bittrex_bch = data.result.Last;
+        $scope.coinone_bch = data2.bch.last;
+      });
+    });
+
+    get_json('http://j96.me:3000/get?url=https://bittrex.com/api/v1.1/public/getticker?market=ETH-BCC', function(data) {
+      get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
+        data = JSON.parse(data);
+        $scope.bittrex_eth_bch_krw = data.result.Last * data2.eth.last;
+        $scope.bittrex_eth_bch = data.result.Last;
         $scope.coinone_bch = data2.bch.last;
       });
     });
