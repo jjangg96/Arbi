@@ -303,7 +303,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
       });
     });
 
-    get_json('https://bittrex.com/api/v1.1/public/getticker?market=BTC-BCC', function(data) {
+    get_json('http://j96.me:3000/get?url=https://bittrex.com/api/v1.1/public/getticker?market=BTC-BCC', function(data) {
       get_json('http://api.coinone.co.kr/ticker?currency=all', function(data2) {
         $scope.bittrex_bch_krw = data.result.Last * data2.btc.last;
         $scope.bittrex_bch = data.result.Last;
