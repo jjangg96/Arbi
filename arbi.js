@@ -44,6 +44,7 @@ arbiApp.controller('arbiController', function arbiController($scope) {
   $scope.poloniex_bch = 0;
   $scope.poloniex_eth_bch_krw = 0;
   $scope.poloniex_eth_bch = 0;
+  $scope.binance_withdraw = '';
 
   //init
   $scope.coins.forEach(function(coin){
@@ -484,6 +485,18 @@ arbiApp.controller('arbiController', function arbiController($scope) {
 
 
   }, 2000);
+
+  setInterval(function(){
+      $.ajax({url:'http://j96.me:3000/get?url=https://www.binance.com/assetWithdraw/getAllAsset.html'})
+          .done(function(a) {
+              a = JSON.parse(a);
+              a.forEach(function(item) {
+                  if(item.assetCode == 'IOTA') {
+                      $scope.binance_withdraw = item.enableWithdraw;
+                  }
+              });
+          });
+  }, 5 * 1000);
 });
 
 
